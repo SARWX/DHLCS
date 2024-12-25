@@ -1,4 +1,6 @@
 import java.math.BigInteger;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -14,23 +16,34 @@ public class Server extends UnicastRemoteObject
 		System.out.println("Hey dude!");		
 	}
 
-	public boolean isPrime(BigInteger number) {
-	    // Negative, 0, and 1 aren't prime
-	    if (number.compareTo(BigInteger.ONE) <= 0) { // number <= 1
-	        return false;
-	    }
+	public boolean isPrime(BigInteger n) {
+        if (n.compareTo(BigInteger.ONE) <= 0) {
+            return false; // filter 1 and negative
+        }
 
-	    // Check divisors from 2 to sqrt number
-	    BigInteger sqrt = number.sqrt(); // Efficient computation of sqrt number
-	    BigInteger two = BigInteger.TWO;
+        // Check 2, 3 and 5
+        if (n.mod(BigInteger.TWO).equals(BigInteger.ZERO)) return n.equals(BigInteger.TWO);
+        if (n.mod(BigInteger.valueOf(3)).equals(BigInteger.ZERO)) return n.equals(BigInteger.valueOf(3));
+        if (n.mod(BigInteger.valueOf(5)).equals(BigInteger.ZERO)) return n.equals(BigInteger.valueOf(5));
 
-	    for (BigInteger i = two; i.compareTo(sqrt) <= 0; i = i.add(BigInteger.ONE)) { // i++
-	        if (number.mod(i).equals(BigInteger.ZERO)) { // number % i == 0
-	            return false; // Divider is found -> number isn't prime
-	        }
-	    }
-	    return true; // Number is prime
-	}
+        // Increment cycle
+        int[] inc = {4, 2, 4, 6, 2, 6};
+        BigInteger k = BigInteger.valueOf(7);
+        int i = 0;
+
+        // First position is k = 7
+        while (k.multiply(k).compareTo(n) <= 0) {
+            if (n.mod(k).equals(BigInteger.ZERO)) {
+                return false; // Not prime
+            }
+
+            // Increment k
+            k = k.add(BigInteger.valueOf(inc[i]));
+            i = (i + 1) % inc.length; // Keep cycle order
+        }
+
+        return true; // The number is prime
+    }
 	
     public static void main(String[] args) {
         try {
