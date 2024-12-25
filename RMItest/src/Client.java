@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,16 +12,17 @@ public class Client {
 		IServer s = (IServer) re.lookup("server");
 		s.m();
 		
-		Scanner scanner = new Scanner(System.in);
-		System.out.print("Enter a number to check if it is prime: ");
-        int number = scanner.nextInt();
-
-        if (s.isPrime(number)) {
-            System.out.println("The number " + number + " is prime.");
-        } else {
-            System.out.println("The number " + number + " is not prime.");
-        }
-
+		try(Scanner scanner = new Scanner(System.in)) {
+			System.out.print("Enter a number to check if it is prime: ");
+	//        int number = scanner.nextInt();
+			BigInteger number = new BigInteger(scanner.next());
+	
+	        if (s.isPrime(number)) {
+	            System.out.println("The number " + number + " is prime.");
+	        } else {
+	            System.out.println("The number " + number + " is not prime.");
+	        }
+		}	
 	}
 
 }
