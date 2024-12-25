@@ -27,39 +27,41 @@ public class Server_socket {
 	}// Number is prime
     
 
-	public static void main(String[] args) throws IOException {
-		System.out.println("Server has started...");
-		ServerSocket s = new ServerSocket(9001);
-		Socket so = s.accept();
-		
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(so.getInputStream()));
-		String message = in.readLine();
-		
-		while(message != null) {
-			if (message.equals("message")) {
-				m();
-			} else if (message.startsWith("isPrime ")) {
-			    try {
-			        // Parse number
-			        int number = Integer.parseInt(message.substring(8).trim());
-			        // Check if number is prime
-			        if (isPrime(number)) {
-			            System.out.println(number + " is Prime.");
-			        } else {
-			            System.out.println(number + " is not Prime.");
-			        }
-			    } catch (NumberFormatException e) {
-			        System.out.println("Error: can't convert number after 'isPrime'.");
-			    }
-			} else {
-			    System.out.println("No such command: " + message);
-			    System.out.println();
-			}
-			message = in.readLine();
-		}
-		
-		so.close();
-		s.close();
+	 public static void main(String[] args) {
+	        System.out.println("Server has started...");
+
+	        try (ServerSocket serverSocket = new ServerSocket(9001)) {
+	            while (true) {
+	                try (Socket clientSocket = serverSocket.accept();
+	                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+
+	                    System.out.println("Client connected: " + clientSocket.getRemoteSocketAddress());
+
+	                    String message;
+	                    while ((message = in.readLine()) != null) {
+	                        if (message.equals("message")) {
+	                            m();
+	                        } else if (message.startsWith("isPrime ")) {
+	                            try {
+	                                int number = Integer.parseInt(message.substring(8).trim());
+	                                if (isPrime(number)) {
+	                                    System.out.println("The number " + number + " is Prime.");
+	                                } else {
+	                                    System.out.println("The number " + number + " is not Prime.");
+	                                }
+	                            } catch (NumberFormatException e) {
+	                                System.out.println("Error: can't convert number after 'isPrime'.");
+	                            }
+	                        } else {
+	                            System.out.println("No such command: " + message);
+	                        }
+	                    }
+	                } catch (IOException e) {
+	                    System.out.println("Client connection error: " + e.getMessage());
+	                }
+	            }
+	        } catch (IOException e) {
+	            System.out.println("Server error: " + e.getMessage());
+	        }
+	    }
 	}
-}
